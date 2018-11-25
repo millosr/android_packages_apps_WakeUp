@@ -33,6 +33,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -128,6 +129,8 @@ public class WakeGestureSettings extends Activity {
         private SwitchPreference mPrefKernelWg;
         private SwitchPreference mPrefKernelProximity;
         private SeekBarPreference mPrefKernelVibStrength;
+        
+        private Handler mHandler;
 
         @SuppressWarnings("deprecation")
         @Override
@@ -163,6 +166,8 @@ public class WakeGestureSettings extends Activity {
             mPrefKernelVibStrength.setMax(90);
             mPrefKernelVibStrength.setProgress(getPreferenceManager().getSharedPreferences().getInt(PREF_KEY_VIB_STRENGTH, 20));
             mPrefKernelVibStrength.setOnPreferenceChangeListener(this);
+
+            mHandler = new Handler();
         }
 
         @Override
@@ -187,7 +192,12 @@ public class WakeGestureSettings extends Activity {
             }
 
             if (rc) {
-                updateAllOptions();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateAllOptions();
+                    }
+                });
             }
 
             return rc;
@@ -237,13 +247,15 @@ public class WakeGestureSettings extends Activity {
         }
 
         private void updateAllOptions() {
-            boolean wake_gesture_state = WakeGesture.isWakeGesture();
+            boolean wgEnabled = WakeGesture.isWakeGesture();
+            boolean dt2wEnabled = wgEnabled && mPrefs.getBoolean(PREF_KEY_DT2W, false);
+            boolean sweepEnabled = wgEnabled && mPrefs.getBoolean(PREF_KEY_S2W, false);
 
-            mPrefDoubleTap.setEnabled(wake_gesture_state && WakeGesture.DOUBLETAP.isEnabled());
-            mPrefSweepRight.setEnabled(wake_gesture_state && WakeGesture.SWEEP_RIGHT.isEnabled());
-            mPrefSweepLeft.setEnabled(wake_gesture_state && WakeGesture.SWEEP_LEFT.isEnabled());
-            mPrefSweepUp.setEnabled(wake_gesture_state && WakeGesture.SWEEP_UP.isEnabled());
-            mPrefSweepDown.setEnabled(wake_gesture_state &&WakeGesture.SWEEP_DOWN.isEnabled());
+            mPrefDoubleTap.setEnabled(dt2wEnabled);
+            mPrefSweepRight.setEnabled(sweepEnabled);
+            mPrefSweepLeft.setEnabled(sweepEnabled);
+            mPrefSweepUp.setEnabled(sweepEnabled);
+            mPrefSweepDown.setEnabled(sweepEnabled);
             mPrefKernelDt2w.setEnabled(WakeGesture.supportDoubleTap());
             mPrefKernelS2w.setEnabled(WakeGesture.supportSweep());
             mPrefKernelWg.setEnabled(WakeGesture.supportWakeGesture());
