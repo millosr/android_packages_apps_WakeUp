@@ -28,6 +28,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 public class TorchService extends Service {
     private static final String TAG = "WG:TorchService";
@@ -97,6 +98,7 @@ public class TorchService extends Service {
 
     private synchronized void setTorchOn() {
         try {
+            Log.i(TAG, "setTorchOn");
             if (mCamera == null) {
                 mCamera = Camera.open();
             }
@@ -119,7 +121,7 @@ public class TorchService extends Service {
             }
         } catch (Exception e) {
             mTorchStatus = TORCH_STATUS_ERROR;
-            e.printStackTrace();
+            Log.e(TAG, "TORCH_STATUS_ERROR", e);
         } finally {
             Intent i = new Intent(ACTION_TORCH_STATUS_CHANGED);
             i.putExtra(EXTRA_TORCH_STATUS, mTorchStatus);
@@ -132,6 +134,7 @@ public class TorchService extends Service {
 
     private synchronized void setTorchOff() {
         try {
+            Log.i(TAG, "setTorchOff");
             mHandler.removeCallbacks(mTorchTimeoutRunnable);
             if (mPartialWakeLock != null && mPartialWakeLock.isHeld()) {
                 mPartialWakeLock.release();
@@ -148,7 +151,7 @@ public class TorchService extends Service {
             mTorchStatus = TORCH_STATUS_OFF;
         } catch (Exception e) {
             mTorchStatus = TORCH_STATUS_ERROR;
-            e.printStackTrace();
+            Log.e(TAG, "TORCH_STATUS_ERROR", e);
         } finally {
             Intent i = new Intent(ACTION_TORCH_STATUS_CHANGED);
             i.putExtra(EXTRA_TORCH_STATUS, mTorchStatus);
@@ -167,6 +170,7 @@ public class TorchService extends Service {
     private Runnable mTorchTimeoutRunnable = new Runnable() {
         @Override
         public void run() {
+            Log.i(TAG, "torch timeout");
             setTorchOff();
         }
     };
