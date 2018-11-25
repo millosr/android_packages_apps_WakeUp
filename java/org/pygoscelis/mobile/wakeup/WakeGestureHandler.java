@@ -84,7 +84,7 @@ public class WakeGestureHandler implements IWakeGestureListener {
             Intent intent = Intent.parseUri(uri, 0);
             return intent;
         } catch (URISyntaxException e) {
-            Log.d(TAG,"Error parsing uri: " + e.getMessage());
+            Log.d(TAG,"Error parsing uri", e);
             return null;
         }
     }
@@ -96,7 +96,7 @@ public class WakeGestureHandler implements IWakeGestureListener {
 
     @Override
     public void onProcessingException(Exception e) {
-        Log.d(TAG,"onProcessingException: " + e.getMessage());
+        Log.d(TAG,"onProcessingException", e);
     }
 
     @SuppressWarnings("deprecation")

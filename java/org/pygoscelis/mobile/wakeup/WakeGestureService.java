@@ -32,11 +32,15 @@ public class WakeGestureService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand");
+
         if (WakeGesture.supportGestures()) {
+            Log.i(TAG, "supportGestures = true, initKernelParameters");
             //Try to init kernel settings
             WakeGestureSettings.SettingsFragment.initKernelParameters(getApplicationContext());
 
             if (WakeGesture.isWakeGesture()) {
+                Log.i(TAG, "isWakeGesture = true");
                 if (handler == null) {
                     handler = new WakeGestureHandler(getApplicationContext());
                     Log.d(TAG, "Start WakeGestureHandler");
